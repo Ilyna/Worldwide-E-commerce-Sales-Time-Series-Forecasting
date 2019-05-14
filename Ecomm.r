@@ -1,13 +1,5 @@
----
-title: "Untitled"
-author: "Yann-bor Wen"
-date: "May 1, 2019"
-output: pdf_document
----
 
-```{r}
 library(forecast)
-#Read the file from directory
 setwd("/Users/Yann-bor Wen/Documents/Graduate School/Econ 5337")
 getwd()
 
@@ -21,9 +13,7 @@ ecommHOLD
 
 plot(ecomm)
 seasonplot(ecomm)
-```
 
-```{r}
 #Perform Unit root test on original data
 library(urca)
 summary(ur.df(ecommHOLD,type="trend",selectlags="AIC",lags=32))
@@ -68,80 +58,51 @@ pacf(Mode4$residuals,40)
 
 Model3
 
-```
-```{r}
 Model5=Arima(ecommHOLD,order=c(1,1,1),seasonal=c(1,1,2))
 acf(Model4$residuals,40)
 pacf(Mode4$residuals,40)
 Model5
-```
 
-
-```{r}
 Box.test(Model3$residuals,40,type="Ljung-Box")
-```
 
-```{r}
+# Make predictions
 pred = forecast(Model3,h=4)
 pred
 upper=ts(pred$upper[,1],start=c(2017,4),frequency=4)
 lower=ts(pred$lower[,1],start=c(2017,4),frequency=4)
 winDATA=window(ecomm,start=c(2015,4),end=c(2018,3))         
 plot(cbind(winDATA,pred$mean,upper,lower),plot.type="single",ylab="Forecast %",main="Forecast % Digital Sales",col=c("BLACK","BLUE","RED","GREEN"))
-```
-```{r}
+
+# Compare with ets
 e = ets(diff(ecommHOLD))
 f = forecast(e,h=4)
 e
-```
 
-```{r}
+# Compare with hw
 holt = hw(ecommHOLD,h=4,trend="additive",seasonal="additive")
 holt
-```
 
-```{r}
+
 w = window(ecomm,start=c(2017,4),end=c(2018,3))
 predi = forecast(Initial,h=4)
 predm = forecast(Model,h=4)
 data.table(w)
-```
 
-```{r}
 data.table(
   Error = c("RMSE","ME"),
   HoltWinters = c(sqrt(sum((holt$mean-w)^2)/4),sum(holt$mean-w)/4),
   InitialSARIMA = c(sqrt(sum((predi$mean-w)^2)/4),sum(predi$mean-w)/4),
   FinalSARIMA = c(sqrt(sum((pred$mean-w)^2)/4),sum(pred$mean-w)/4)
 )
-```
-```{r}
+
 upper=ts(holt$upper[,1],start=c(2017,4),frequency=4)
 lower=ts(holt$lower[,1],start=c(2017,4),frequency=4)
 plot(cbind(winDATA,holt$mean,upper,lower),plot.type="single",ylab="Forecast %",main="Forecast % Digital Sales",col=c("BLACK","BLUE","RED","GREEN"))
-```
 
-```{r}
 Model4=Arima(ecomm,order=c(1,1,1),seasonal=c(1,1,1))
 pred = forecast(Model4,h=4)
 upper=ts(pred$upper[,1],start=c(2018,4),frequency=4)
 lower=ts(pred$lower[,1],start=c(2018,4),frequency=4)
 winDATA=window(ecomm,start=c(2010,4),end=c(2018,4))         
 plot(cbind(winDATA,pred$mean,upper,lower),plot.type="single",ylab="Forecast %",main="Forecast % Digital Sales",col=c("BLACK","BLUE","RED","GREEN"))
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
